@@ -44,15 +44,14 @@ pub struct RevLines<R> {
 impl<R:Seek+Read> RevLines<R> {
     /// Create a new `RevLines` struct from a `BufReader<R>`. Internal
     /// buffering for iteration will default to 4096 bytes at a time.
-    pub fn new(reader: BufReader<R>) -> Result<RevLines<R>> {
-        RevLines::with_capacity(DEFAULT_SIZE, reader)
+    pub fn new(reader: BufReader<R>, pos: u64) -> Result<RevLines<R>> {
+        RevLines::with_capacity(DEFAULT_SIZE, reader, pos)
     }
 
     /// Create a new `RevLines` struct from a `BufReader<R>`. Interal
     /// buffering for iteration will use `cap` bytes at a time.
-    pub fn with_capacity(cap: usize, mut reader: BufReader<R>) -> Result<RevLines<R>> {
-        // Seek to end of reader now
-        let reader_size = reader.seek(SeekFrom::End(0))?;
+    pub fn with_capacity(cap: usize, mut reader: BufReader<R>, pos: u64) -> Result<RevLines<R>> {
+        let reader_size = reader.seek(SeekFrom::Start(pos))?;
 
         let mut rev_lines = RevLines {
             reader: reader,
